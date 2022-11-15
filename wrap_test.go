@@ -1,7 +1,6 @@
 package ucfgwrap_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/elastic/go-ucfg"
@@ -9,8 +8,7 @@ import (
 )
 
 func TestWrap(t *testing.T) {
-	os.Setenv("WRAP_TEST", "stone")
-	defer os.Unsetenv("WRAP_TEST")
+	t.Setenv("WRAP_TEST", "stone")
 	yaml := "key: ${WRAP_TEST}"
 	config, err := ucfgwrap.FromYAML([]byte(yaml), ucfg.VarExp, ucfg.ResolveEnv)
 	if err != nil {
