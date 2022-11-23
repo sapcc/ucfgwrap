@@ -17,6 +17,7 @@
 *
 *******************************************************************************/
 
+// Small wrapper for ucfg that passes a slice of ucfg.Options to every unpack function.
 package ucfgwrap
 
 import (
@@ -25,15 +26,28 @@ import (
 	"github.com/elastic/go-ucfg/yaml"
 )
 
+// Config bundles a ucfg.Config with a slice of ucfg.Options.
 type Config struct {
 	config  *ucfg.Config
 	options []ucfg.Option
 }
 
+// Unpack unpacks to the given pointer.
 func (c *Config) Unpack(to interface{}) error {
 	return c.config.Unpack(to, c.options...)
 }
 
+// Wrap wraps a ucfg.Config together with the options contained
+// in the parent ucfgwrap.Config. This handy when parsing into
+// ucfg.Configs but passing around ucfgwrap.Configs.
+func (c *Config) Wrap(config *ucfg.Config) Config {
+	return Config{
+		config:  config,
+		options: c.options,
+	}
+}
+
+// FromYAML parses the given yaml into a ucfgwrap.Config using the given options.
 func FromYAML(data []byte, opts ...ucfg.Option) (Config, error) {
 	yamlConf, err := yaml.NewConfig(data, opts...)
 	if err != nil {
@@ -45,6 +59,7 @@ func FromYAML(data []byte, opts ...ucfg.Option) (Config, error) {
 	}, nil
 }
 
+// FromYAMLFile parses the given file into a ucfgwrap.Config using the given options.
 func FromYAMLFile(path string, opts ...ucfg.Option) (Config, error) {
 	yamlConf, err := yaml.NewConfigWithFile(path, opts...)
 	if err != nil {
@@ -56,6 +71,7 @@ func FromYAMLFile(path string, opts ...ucfg.Option) (Config, error) {
 	}, nil
 }
 
+// FromJSON parses the given json into a ucfgwrap.Config using the given options.
 func FromJSON(data []byte, opts ...ucfg.Option) (Config, error) {
 	jsonConf, err := json.NewConfig(data, opts...)
 	if err != nil {
@@ -67,6 +83,7 @@ func FromJSON(data []byte, opts ...ucfg.Option) (Config, error) {
 	}, nil
 }
 
+// FromJSONFile parses the given file into a ucfgwrap.Config using the given options.
 func FromJSONFile(path string, opts ...ucfg.Option) (Config, error) {
 	jsonConf, err := json.NewConfigWithFile(path, opts...)
 	if err != nil {
